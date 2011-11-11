@@ -86,7 +86,7 @@ var $return_data = "";
   function _truncate_chars($content, $limit, $append) {
     // Removing the below to see how it effect UTF-8. 
     //$content = preg_replace('/\s+?(\S+)?$/', '', substr($content, 0, ($limit+1)));
-    $content = $this->EE->functions->char_limiter($content, $limit) . $append; 
+    $content = $this->hacksaw_char_limiter($content, $limit) . $append; 
     return $content;
   }
   
@@ -99,6 +99,42 @@ var $return_data = "";
 		$content = $this->_truncate_words(strip_tags($content, $allow), $words, '') . $append;
 	}
     return $content;
+    
+    // Hacksaw Version Of Character limiter
+    // basically the EE char limiter version but it removes the auto '...' at the end
+	function hacksaw_char_limiter($str, $num = 500)
+	{
+		if (strlen($str) < $num) 
+		{
+			return $str;
+		}
+		
+		$str = str_replace("\n", " ", $str);		
+		
+		$str = preg_replace("/\s+/", " ", $str);
+
+		if (strlen($str) <= $num)
+		{
+			return $str;
+		}
+		$str = trim($str);
+										
+		$out = "";
+				
+		foreach (explode(" ", trim($str)) as $val)
+		{
+			$out .= $val;			
+												
+			if (strlen($out) >= $num)
+			{
+				return (strlen($out) == strlen($str)) ? $out : $out; 
+			}
+			
+			$out .= ' ';
+		}
+	}
+	
+	// --------------------------------------------------------------------
   }
   
 
